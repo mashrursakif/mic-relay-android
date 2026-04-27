@@ -1,33 +1,127 @@
 package com.example.mic_relay
 
+import RecordMic
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import com.example.mic_relay.ui.theme.MicrelayTheme
+import com.example.mic_relay.utils.SendAudio
 
 class MainActivity : ComponentActivity() {
+    lateinit var ipInput: EditText
+    lateinit var portInput: EditText
+    lateinit var recordButton: Button
+
+    lateinit var ip: String;
+    var port: Int? = null;
+
+    var isRecording = false;
+
+    val recordMic = RecordMic()
+    val sendAudio = SendAudio()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
-        setContent {
-            MicrelayTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+        setContentView(R.layout.activity_main)
+
+        ipInput = findViewById<EditText>(R.id.ip_addr_input)
+        portInput = findViewById<EditText>(R.id.port_input)
+        recordButton = findViewById<Button>(R.id.record_button)
+
+        recordButton.setOnClickListener {
+            if (!isRecording) {
+                ip = ipInput.text.toString().trim()
+                port = portInput.text.toString().toIntOrNull()
+
+                if (ip.isNotEmpty() && port != null) {
+                    checkMicPermissionAndStart();
+
+                    updateState(true)
                 }
+            } else {
+                recordMic.stop();
+                sendAudio.closeTCP();
+                updateState(false)
             }
         }
+
+        recordMic.onRecordingStateChanged = { recording ->
+            Log.e("TAG", "recording: $recording")
+            runOnUiThread {
+                updateState(recording)
+            }
+        }
+
+//        setContent {
+//            MicrelayTheme {
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                    Greeting(
+//                        name = "Android",
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+//                }
+//            }
+//        }
     }
+
+
+
+
+    private val requestMicPermission =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+
+            if (isGranted) {
+                checkMicPermissionAndStart()
+            } else {
+                //
+            }
+        }
+
+
+    fun checkMicPermissionAndStart() {
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            if (port != null) {
+                Thread {
+                    val outputStream = sendAudio.setupTCP(ip, port!!)
+                    recordMic.start {
+                        data -> sendAudio.sendData(outputStream, data)
+                    }
+                }.start()
+            }
+        } else {
+            requestMicPermission.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    fun updateState(recording: Boolean) {
+        isRecording = recording;
+        if (recording) {
+            recordButton.text = "STOP";
+        } else {
+            recordButton.text = "START";
+        }
+    }
+
 }
 
 @Composable

@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.mic_relay"
-    compileSdk = 35
+    compileSdkVersion("android-37.0")
 
     defaultConfig {
         applicationId = "com.example.mic_relay"
