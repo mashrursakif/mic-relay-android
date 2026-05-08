@@ -1,11 +1,13 @@
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.util.Log
 import androidx.annotation.RequiresPermission
 
 class RecordMic {
     var isRecording = false;
     var onRecordingStateChanged: ((Boolean) -> Unit)? = null
+
     var recorder: AudioRecord? = null;
     val minBufferSize = 1024
     val format = AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_16BIT).setSampleRate(48000).setChannelMask(
@@ -35,6 +37,7 @@ class RecordMic {
     }
 
     fun stop() {
+        Log.e("TAG", "Stopping Mic")
         isRecording = false;
         onRecordingStateChanged?.invoke(isRecording)
         recorder?.stop();

@@ -9,10 +9,10 @@ class SendAudio {
     // TCP Setup
 //    lateinit var outputStream: OutputStream;
 
-    val recordMic = RecordMic()
-
      var socket: Socket? = null;
      var outputStream: OutputStream? = null;
+
+    var onConnectionClosed: (() -> Unit)? = null
 
     fun setupTCP(ip: String, port: Int): OutputStream? {
         try {
@@ -29,8 +29,7 @@ class SendAudio {
             outputStream?.write(data)
         } catch (e: Exception) {
             Log.e("TAG", "TCP Stream Write Failed");
-            closeTCP();
-            recordMic.stop();
+            onConnectionClosed?.invoke()
         }
     }
 
@@ -40,25 +39,20 @@ class SendAudio {
         try {
             outputStream?.flush()
         } catch (e: Exception) {
-            Log.e("TAG", "ERR Flush");
 
         }
 
         try {
             outputStream?.close()
         } catch (e: Exception) {
-            Log.e("TAG", "ERR stream close");
 
         }
 
         try {
             socket?.close()
         } catch  (e: Exception) {
-            Log.e("TAG", "ERR socket close");
 
         }
-
-        Log.e("TAG", "setting var to null")
 
         outputStream = null
         socket = null

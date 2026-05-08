@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.example.mic_relay.ui.theme.MicrelayTheme
 import com.example.mic_relay.utils.SendAudio
+import com.example.mic_relay.utils.StreamController
 
 class MainActivity : ComponentActivity() {
     lateinit var ipInput: EditText
@@ -28,8 +29,7 @@ class MainActivity : ComponentActivity() {
 
     var isRecording = false;
 
-    val recordMic = RecordMic()
-    val sendAudio = SendAudio()
+    val controller = StreamController(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +52,12 @@ class MainActivity : ComponentActivity() {
                     updateState(true)
                 }
             } else {
-                recordMic.stop();
-                sendAudio.closeTCP();
-                updateState(false)
+                controller.stop();
+//                updateState(false)
             }
         }
 
-        recordMic.onRecordingStateChanged = { recording ->
+        controller.onRecordingStateChanged = { recording ->
             Log.e("TAG", "recording: $recording")
             runOnUiThread {
                 updateState(recording)
@@ -94,19 +93,13 @@ class MainActivity : ComponentActivity() {
 
 
     fun checkMicPermissionAndStart() {
-
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             if (port != null) {
-                Thread {
-                    val outputStream = sendAudio.setupTCP(ip, port!!)
-                    recordMic.start {
-                        data -> sendAudio.sendData(outputStream, data)
-                    }
-                }.start()
+                controller.start(ip, port!!)
             }
         } else {
             requestMicPermission.launch(Manifest.permission.RECORD_AUDIO)
@@ -115,6 +108,7 @@ class MainActivity : ComponentActivity() {
 
     fun updateState(recording: Boolean) {
         isRecording = recording;
+
         if (recording) {
             recordButton.text = "STOP";
         } else {
