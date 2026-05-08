@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 
 
 class StreamController(private val context: Context) {
+    var isRecording = false;
     val recordMic = RecordMic()
     val sendAudio = SendAudio()
 
@@ -21,22 +22,23 @@ class StreamController(private val context: Context) {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             Thread {
-                val outputStream = sendAudio.setupTCP(ip, port)
+                sendAudio.setupSocket(ip, port)
 
                 sendAudio.onConnectionClosed = {
                     stop()
                 }
 
                 recordMic.start { data ->
-                    sendAudio.sendData(outputStream, data)
+                    sendAudio.sendData(data)
                 }
 
-                recordMic.onRecordingStateChanged = { recording ->
-                    if (!recording) {
-                        stop()
-                    }
-                }
+//                recordMic.onRecordingStateChanged = { recording ->
+//                    if (!recording) {
+//                        stop()
+//                    }
+//                }
             }.start()
+            isRecording = true;
             onRecordingStateChanged?.invoke(true);
         } else {
             Log.e("TAG", "Microphone Permission not Granted")
@@ -47,7 +49,8 @@ class StreamController(private val context: Context) {
         Log.e("TAG", "Stopping Controller")
 
         recordMic.stop();
-        sendAudio.closeTCP();
+        sendAudio.closeSocket();
+        isRecording = false;
         onRecordingStateChanged?.invoke(false);
     }
 }

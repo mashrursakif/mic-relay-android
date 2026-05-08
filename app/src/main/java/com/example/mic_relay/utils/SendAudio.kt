@@ -1,60 +1,69 @@
 package com.example.mic_relay.utils
 
-import RecordMic
 import android.util.Log
-import java.io.OutputStream
-import java.net.Socket
+import java.net.DatagramPacket
+//import java.io.OutputStream
+import java.net.DatagramSocket
+import java.net.InetAddress
 
 class SendAudio {
     // TCP Setup
 //    lateinit var outputStream: OutputStream;
 
-     var socket: Socket? = null;
-     var outputStream: OutputStream? = null;
+     var socket: DatagramSocket? = null;
+     var address: InetAddress? = null;
+     var port: Int = 0;
+//     var outputStream: OutputStream? = null;
 
     var onConnectionClosed: (() -> Unit)? = null
 
-    fun setupTCP(ip: String, port: Int): OutputStream? {
+    fun setupSocket(ip: String, portValue: Int) {
         try {
-            socket = Socket(ip, port)
-            outputStream = socket?.getOutputStream()
+//            socket = Socket(ip, port)
+            socket = DatagramSocket()
+            address = InetAddress.getByName(ip)
+            port = portValue;
+//            outputStream = socket?.getOutputStream()
         } catch (e: Exception) {
-            Log.e("TcpClient", "Connect failed: ${e.message}", e)
+            Log.e("SOCKET", "Connect failed: ${e.message}", e)
         }
-        return outputStream;
     }
 
-    fun sendData(outputStream: OutputStream?, data: ByteArray) {
+    fun sendData(data: ByteArray) {
         try {
-            outputStream?.write(data)
+            Log.e("TAG", "Sending data $data.size")
+//            outputStream?.write(data)
+            val packet = DatagramPacket(data, data.size, address, port);
+            socket?.send(packet)
         } catch (e: Exception) {
-            Log.e("TAG", "TCP Stream Write Failed");
+            Log.e("TAG", "Send Data Failed");
             onConnectionClosed?.invoke()
         }
     }
 
-    fun closeTCP() {
-        Log.e("TAG", "Closing TCP");
+    fun closeSocket() {
+        Log.e("TAG", "Closing Socket");
 
-        try {
-            outputStream?.flush()
-        } catch (e: Exception) {
-
-        }
-
-        try {
-            outputStream?.close()
-        } catch (e: Exception) {
-
-        }
-
-        try {
-            socket?.close()
-        } catch  (e: Exception) {
-
-        }
-
-        outputStream = null
+//        try {
+//            outputStream?.flush()
+//        } catch (e: Exception) {
+//
+//        }
+//
+//        try {
+//            outputStream?.close()
+//        } catch (e: Exception) {
+//
+//        }
+//
+//        try {
+//            socket?.close()
+//        } catch  (e: Exception) {
+//
+//        }
+//
+//        outputStream = null
+        socket?.close();
         socket = null
     }
 }

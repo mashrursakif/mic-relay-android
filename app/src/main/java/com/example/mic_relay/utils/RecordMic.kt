@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 
 class RecordMic {
-    var isRecording = false;
-    var onRecordingStateChanged: ((Boolean) -> Unit)? = null
+//    var isRecording = false;
+//    var onRecordingStateChanged: ((Boolean) -> Unit)? = null
 
     var recorder: AudioRecord? = null;
     val minBufferSize = 1024
@@ -21,25 +21,25 @@ class RecordMic {
             .setBufferSizeInBytes(2 * minBufferSize).build()
 
         recorder?.startRecording()
-        isRecording = true;
-        onRecordingStateChanged?.invoke(isRecording)
+//        isRecording = true;
+//        onRecordingStateChanged?.invoke(isRecording)
 
         val buffer = ByteArray(minBufferSize);
 
-//        Thread {
-        while(isRecording) {
+//        while(isRecording) {
+        while (recorder != null) {
             val read = recorder?.read(buffer, 0, buffer.size);
             if (read != null && read > 0) {
                 sendAudio(buffer.copyOf(read))
             }
         }
-//        }.start()
+//        }
     }
 
     fun stop() {
         Log.e("TAG", "Stopping Mic")
-        isRecording = false;
-        onRecordingStateChanged?.invoke(isRecording)
+//        isRecording = false;
+//        onRecordingStateChanged?.invoke(isRecording)
         recorder?.stop();
         recorder?.release();
         recorder = null;

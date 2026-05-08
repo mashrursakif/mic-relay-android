@@ -27,8 +27,6 @@ class MainActivity : ComponentActivity() {
     lateinit var ip: String;
     var port: Int? = null;
 
-    var isRecording = false;
-
     val controller = StreamController(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,14 +40,13 @@ class MainActivity : ComponentActivity() {
         recordButton = findViewById<Button>(R.id.record_button)
 
         recordButton.setOnClickListener {
-            if (!isRecording) {
+            if (!controller.isRecording) {
                 ip = ipInput.text.toString().trim()
                 port = portInput.text.toString().toIntOrNull()
 
                 if (ip.isNotEmpty() && port != null) {
                     checkMicPermissionAndStart();
-
-                    updateState(true)
+//                    updateState(true)
                 }
             } else {
                 controller.stop();
@@ -106,10 +103,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun updateState(recording: Boolean) {
-        isRecording = recording;
+    fun updateState(value: Boolean) {
+        Log.e("TAG", "update state -> recording: $value")
+//        controller.onRecordingStateChanged?.invoke(value)
 
-        if (recording) {
+        if (value) {
             recordButton.text = "STOP";
         } else {
             recordButton.text = "START";
