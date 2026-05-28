@@ -3,53 +3,58 @@
     android:id="@+id/main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16sp"
-    android:paddingTop="20sp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/app_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8sp"
-        android:background="@color/purple_200"
         android:padding="8sp"
-        android:text="AUDIO MIC"
+        android:text="MIC RELAY"
         android:textAlignment="center"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
-    <EditText
-        android:id="@+id/ip_addr_input"
+    <LinearLayout
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="IP Address"
-        android:inputType="textUri" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="12sp">
 
-    <EditText
-        android:id="@+id/port_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Port"
-        android:inputType="number" />
-
-    <Button
-        android:id="@+id/record_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="START" />
-
-    <ScrollView
-        android:id="@+id/logs_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/logs_text"
+        <EditText
+            android:id="@+id/ip_addr_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="LOGS:" />
-    </ScrollView>
+            android:ems="10"
+            android:hint="IP Address"
+            android:inputType="textUri" />
+
+        <EditText
+            android:id="@+id/port_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Port"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/record_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="START" />
+
+        <ScrollView
+            android:id="@+id/logs_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/logs_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="LOGS:" />
+        </ScrollView>
+    </LinearLayout>
 
 </LinearLayout>
