@@ -44,17 +44,6 @@
             android:layout_height="wrap_content"
             android:text="START" />
 
-        <ScrollView
-            android:id="@+id/logs_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/logs_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="LOGS:" />
-        </ScrollView>
     </LinearLayout>
 
 </LinearLayout>
